@@ -9,7 +9,7 @@ function AdminNav() {
     alert();
   }
   return (
-    <div className="d-flex  justify-content-between bg-light p-4">
+    <div className="d-flex  justify-content-between bg-light p-4 rounded">
       {/* Search Bar */}
       <div className="input-group d-flex w-25">
         <input
@@ -41,12 +41,6 @@ function AdminNav() {
             className="btn btn-outline-ligth "
             onClick={() => setOpen(!open)}
           >
-            {/* <Link to="/login">
-              <select name="" id="">
-                <option value="">Logout</option>
-              </select>
-              {username}
-            </Link> */}
             {open ? (
               <span className="bi bi-chevron-up"></span>
             ) : (

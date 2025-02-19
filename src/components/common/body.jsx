@@ -2,7 +2,10 @@ import axios from "axios";
 import { getCookie } from "cookies-next";
 import React, { useState, useEffect } from "react";
 import { useCookies } from "react-cookie";
+import { useDispatch } from "react-redux";
 import { Link, Navigate, Outlet, useNavigate } from "react-router-dom";
+import { addAll } from "../../slicer/product-slicer";
+import Skeleton from "react-loading-skeleton";
 
 const ProductGrid = () => {
   const [products, setProducts] = useState([
@@ -16,6 +19,7 @@ const ProductGrid = () => {
       title: "",
     },
   ]);
+  const dispatch = useDispatch();
   const [cookies, setCookie, removeCookie] = useCookies();
 
   const navigate = useNavigate();
@@ -26,6 +30,7 @@ const ProductGrid = () => {
 
   useEffect(() => {
     axios.get(`http://localhost:8080/products`).then((resp) => {
+      // dispatch(addAll(resp.data));
       setProducts(resp.data);
       console.log(resp.data, "resp");
     });
@@ -99,7 +104,7 @@ const ProductGrid = () => {
                         </div>
                         <div className="col-md-6 me-0">
                           <span className="text-secondary ms-3">
-                            {product.rating.count}
+                            {product.rating.count || <Skeleton />}
                           </span>
                         </div>
                       </div>
@@ -109,7 +114,7 @@ const ProductGrid = () => {
                         </div>
                         <div className="col-md-6 me-0">
                           <span className="text-secondary ms-4 fw-bold">
-                            {product.rating.rate}
+                            {product.rating.rate || <Skeleton />}
                           </span>
                         </div>
                       </div>
@@ -122,7 +127,8 @@ const ProductGrid = () => {
                   className="btn btn-dark w-100 text-white"
                   onClick={() => handleShopeNowClick(product.Id)}
                 >
-                  SHOPE NOW <span className="bi bi-caret-right-fill"></span>
+                  SHOPE NOW
+                  <span className="bi bi-caret-right-fill"></span>
                 </button>
               </div>
             </div>

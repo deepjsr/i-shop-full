@@ -52,20 +52,19 @@ function UserRegister() {
   });
   return (
     <div>
-      <div className="container bg-info" style={{ height: "100vh" }}>
+      <div className="container" style={{ height: "100vh" }}>
         <div className="row">
           <div className="col-md-9 offset-md-2">
-            <p className="fw-bold fs-2 text-center">I-shope</p>
             <div className="card bg-light">
               <div
                 className="card-body overflow-auto"
                 style={{ height: "500px" }}
               >
-                <div className="text-center">
+                <div className="">
                   {isAdminRoute ? (
-                    <h3 className="fw-bold fs-3">Register Admin </h3>
+                    <h3 className="fw-bold fs-3 ms-0">Register Admin </h3>
                   ) : (
-                    <h3 className="fw-bold fs-3">Register User </h3>
+                    <h3 className="fw-bold fs-3 ms-0">Register User </h3>
                   )}
                 </div>
                 <form onSubmit={formik.handleSubmit}>

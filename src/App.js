@@ -9,6 +9,7 @@ import PageNotFound from "./components/common/page-not-found";
 import Login from "./components/customer/login";
 import UserRegister from "./components/customer/register";
 import PrivateRoute from "./components/common/private-route";
+import Checkout from "./components/common/checkout";
 
 function App() {
   const location = useLocation();
@@ -24,6 +25,10 @@ function App() {
         <Route
           path="/productdetails/:id"
           element={<PrivateRoute element={<ProductDetails />} />}
+        />
+        <Route
+          path="/checkout"
+          element={<PrivateRoute element={<Checkout />} />}
         />
         <Route path="/adminDash" element={<AdminDashboard />} />
         <Route path="/user-register" element={<UserRegister />} />

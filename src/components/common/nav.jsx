@@ -1,13 +1,57 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import store from "../../store/store";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { changeQuantity } from "../../slicer/slicer";
+import axios from "axios";
+import Skeleton from "react-loading-skeleton";
+import { useNavigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
 
 function NavBar() {
   const productCount = useSelector((state) => state.productCart.productCount);
   const products = useSelector((state) => state.productCart.products) || [];
   const totalPrice = useSelector((state) => state.productCart.TotalPrice);
+  const [open, setOpen] = useState(false);
+  const [cookies, setCookie, removeCookie] = useCookies();
+
   const productArray = Array.isArray(products) ? products : [products];
-  console.log(productArray, "productArray");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState([
+    {
+      CategoryId: 0,
+      CategoryName: "",
+    },
+  ]);
+
+  async function handleSearchResult() {
+    console.log("search result");
+  }
+
+  function handelAddOne(product) {
+    dispatch(changeQuantity({ product, quantity: product.quantity + 1 }));
+  }
+  function handelRemoveOne(product) {
+    dispatch(changeQuantity({ product, quantity: product.quantity - 1 }));
+  }
+
+  function handelRemoveAll(product) {
+    dispatch(changeQuantity({ product, quantity: 0 }));
+  }
+
+  function handleCheckout() {
+    navigate("/checkout");
+  }
+
+  useEffect(() => {
+    //loading categories
+    axios.get(`http://localhost:8080/categories`).then((resp) => {
+      resp.data.unshift({
+        CategoryId: 0,
+        CategoryName: "All",
+      });
+      setCategories(resp.data);
+    });
+  }, []); // Add an empty dependency array to avoid infinite re-renders
 
   return (
     <div className="">
@@ -15,8 +59,16 @@ function NavBar() {
         <h2 className="fs-1 fw-bold">I-Shope</h2>
         <div className="">
           <div className="input-group">
-            <select name="" id="" className="form-control">
-              <option value="">All</option>
+            <select name="CategoryId" className="form-control">
+              {categories.map((category) => (
+                <option
+                  key={category.CategoryId}
+                  value={category.CategoryId}
+                  name={category.CategoryId}
+                >
+                  {category.CategoryName}
+                </option>
+              ))}
             </select>
             <input
               //   onChange={handelSearch}
@@ -71,11 +123,50 @@ function NavBar() {
             {productCount}
           </span>
           <button
-            className="btn  bg-light rounded rounded-circle d-flex justify-content-center align-items-center"
-            style={{ height: "50px", width: "50px" }}
+            className="btn  rounded rounded-circle text-center"
+            style={{
+              height: "50px",
+              width: "50px",
+              backgroundImage: `url(${process.env.PUBLIC_URL}/dp-back.jpg)`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+            onClick={() => setOpen(!open)}
           >
-            p
+            <span className="fw-bold fs-4">
+              {cookies.username.charAt(0).toUpperCase()}
+            </span>
           </button>
+          {open && (
+            <div
+              className="position-absolute bg-white shadow rounded p-2 mt-2"
+              style={{ top: 58, width: "100px" }}
+            >
+              <ul className="list-unstyled mb-0">
+                <li>
+                  <button
+                    className="btn btn-light w-100 text-start"
+                    onClick={() => (
+                      alert("Logging out..."), navigate("/login")
+                    )}
+                  >
+                    Log Out
+                  </button>
+                </li>
+                <li>
+                  <button className=" dropdown-menu btn btn-light w-100 text-start">
+                    Lorem1
+                  </button>
+                  <button className="btn btn-light w-100 text-start">
+                    Lorem1
+                  </button>
+                  <button className="btn btn-light w-100 text-start">
+                    Lorem1
+                  </button>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
       <div className="modal fade modal-lg" id="cartModal" tabIndex="-1">
@@ -95,7 +186,10 @@ function NavBar() {
                 <>
                   <div className="">
                     {productArray.map((product) => (
-                      <div className=" border-bottom border-2 p-2">
+                      <div
+                        className=" border-bottom border-2 p-2"
+                        key={product._id}
+                      >
                         <div className="row d-flex justify-content-between">
                           <div className="col-md-1">
                             <img
@@ -105,21 +199,30 @@ function NavBar() {
                               className="rounded rounded-4 shadow-md"
                             />
                           </div>
-                          <div className=" ms-4 col-md-4">
-                            <span>{product.title}</span>
+                          <div className=" ms-4 my-3 col-md-4">
+                            <span>{product.title || <Skeleton />}</span>
                           </div>
-                          <div className="col-md-2 text-center">
-                            <span className=" my-3 text-secondary fw-bold">
-                              {product.price * product.quantity}
+                          <div className="col-md-2 my-3 text-center">
+                            <span className="text-secondary fw-bold">
+                              {product.price * product.quantity || <Skeleton />}
                             </span>
                           </div>
-                          <div className="col-md-4">
-                            <span className="btn btn-dark btn-sm rounded rounded-circle bi bi-plus"></span>
+                          <div className="col-md-4 my-3">
+                            <button
+                              className="btn btn-dark btn-sm rounded rounded-circle bi bi-plus"
+                              onClick={() => handelAddOne(product)}
+                            ></button>
                             <span className="mx-2 my-2 text-secondary">
-                              {product.quantity}
+                              {product.quantity || <Skeleton />}
                             </span>
-                            <span className=" btn btn-dark btn-sm rounded rounded-circle bi bi-dash"></span>
-                            <span className="btn btn-danger btn-sm rounded rounded-2 mx-4 bi bi-trash"></span>
+                            <button
+                              className="btn btn-dark btn-sm rounded rounded-circle bi bi-dash"
+                              onClick={() => handelRemoveOne(product)}
+                            ></button>
+                            <button
+                              className="btn btn-danger btn-sm rounded rounded-2 mx-4 bi bi-trash"
+                              onClick={() => handelRemoveAll(product)}
+                            ></button>
                           </div>
                         </div>
                       </div>
@@ -139,7 +242,12 @@ function NavBar() {
               >
                 Close
               </button>
-              <button type="button" className="btn btn-warning btn-sm">
+              <button
+                type="button"
+                className="btn btn-warning btn-sm"
+                onClick={handleCheckout}
+                data-bs-dismiss="modal"
+              >
                 Checkout Now
               </button>
             </div>

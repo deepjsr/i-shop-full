@@ -24,7 +24,6 @@ function AdminDashboard() {
       <AdminNav />
       <div className="mt-3 text-end">
         <Link to="#" className=" btn btn-lg btn-outline-success text-center">
-          {/* <span className=" me-2 bi bi-camera-item"></span> */}
           Add Item
         </Link>
       </div>

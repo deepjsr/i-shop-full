@@ -27,8 +27,9 @@ function Login() {
           if (user.Password === values.password) {
             // showLoading();
             const storedIds = JSON.parse(getCookie("id") || "[]");
-
-            setCookie("username", values.username);
+            const expires = new Date();
+            expires.setMinutes(expires.getMinutes() + 15);
+            setCookie("username", values.username, { expires });
             // MySwal.hideLoading();
             navigate(`/productdetails/${storedIds[storedIds.length - 1]}`);
             // navigate(`/productdetails/{id}`);
@@ -51,7 +52,9 @@ function Login() {
             <div className="card mt-5">
               <div className="card-body">
                 <div className="text-center">
-                  <h3 className="card-title">User Login</h3>
+                  <h3 className="text-start mb-3 fw-bold card-title">
+                    User Login
+                  </h3>
                 </div>
                 <form onSubmit={formik.handleSubmit}>
                   <fieldset class="border p-3">
