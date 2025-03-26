@@ -1,4 +1,5 @@
 {
+  "homepage": "https://github.com/deepjsr/i-shop-full",
   "name": "ishop-project",
   "version": "0.1.0",
   "private": true,
@@ -32,7 +33,9 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -52,5 +55,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://i-shop-server.onrender.com"
+  "proxy": "https://i-shop-server.onrender.com",
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  }
 }
