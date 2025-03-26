@@ -8,24 +8,6 @@ function UserRegister() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/adminDash");
   const [message, setMessage] = useState("");
-  const [adminUsers, setAdminUsers] = useState([]);
-
-  useEffect(() => {
-    axios
-      .get(`http://localhost:8080/admin`)
-      .then((resp) => setAdminUsers(resp.data));
-  }, []);
-
-  function VerifyUserId(e) {
-    for (let user of adminUsers) {
-      if (user.UserId === e.target.value) {
-        setMessage(`User Id Already Taken : Try Another`);
-        break;
-      } else {
-        setMessage("");
-      }
-    }
-  }
 
   const formik = useFormik({
     initialValues: {
@@ -41,13 +23,28 @@ function UserRegister() {
     },
     onSubmit: (values) => {
       console.log(values);
-      axios
-        .post("http://localhost:8080/customerregister", values)
-        .then((response) => {
-          console.log(response.data);
-          alert("data saved...");
-          navigate("/");
-        });
+      const registerUser = (retryCount = 0) => {
+        axios
+          .post(
+            `${process.env.REACT_APP_BACKEND_HOST_URL}/customerregiste`,
+            values
+          )
+          .then((response) => {
+            console.log(response.data);
+            alert("Data saved...");
+            navigate("/");
+          })
+          .catch((error) => {
+            console.error("Error registering user:", error);
+            if (retryCount < 2) {
+              console.log(`Retrying... (${retryCount + 1})`);
+              registerUser(retryCount + 1);
+            } else {
+              alert("Failed to register. Please try again later.");
+            }
+          });
+      };
+      registerUser();
     },
   });
   return (
@@ -78,7 +75,6 @@ function UserRegister() {
                         First Name
                       </label>
                       <input
-                        onKeyUp={VerifyUserId}
                         onChange={formik.handleChange}
                         type="text"
                         className="form-control"
@@ -96,7 +92,6 @@ function UserRegister() {
                         Last Name
                       </label>
                       <input
-                        onKeyUp={VerifyUserId}
                         onChange={formik.handleChange}
                         type="text"
                         className="form-control"
@@ -114,7 +109,6 @@ function UserRegister() {
                         User Name
                       </label>
                       <input
-                        onKeyUp={VerifyUserId}
                         onChange={formik.handleChange}
                         type="text"
                         className="form-control"
@@ -123,7 +117,7 @@ function UserRegister() {
                         required
                       />
                       {/* {message} */}
-                      <div class="text-danger">{message}</div>
+                      <div className="text-danger">{message}</div>
                     </div>
 
                     <div className="mb-3">
@@ -199,9 +193,9 @@ function UserRegister() {
                       >
                         Gender
                       </label>
-                      <div class="form-check mx-2 mt-1">
+                      <div className="form-check mx-2 mt-1">
                         <input
-                          class="form-check-input"
+                          className="form-check-input"
                           type="radio"
                           name="Gender"
                           id="Gender"
@@ -209,7 +203,7 @@ function UserRegister() {
                           checked={formik.values.Gender === "M"}
                           onChange={formik.handleChange}
                         />
-                        <label class="form-check-label" for="Gender">
+                        <label className="form-check-label" for="Gender">
                           Male
                         </label>
                       </div>

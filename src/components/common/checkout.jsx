@@ -58,7 +58,6 @@ const Checkout = () => {
       description: "Test Mode",
       order_id: data.id,
       handler: async (response) => {
-        console.log("response", response);
         try {
           const res = await fetch(
             `${process.env.REACT_APP_BACKEND_HOST_URL}/api/payment/verify`,
@@ -106,8 +105,7 @@ const Checkout = () => {
   return (
     <div className="container my-5">
       <div className="alert alert-danger">
-        Don't ask for Discounts{" "}
-        <span className="bi bi-emoji-smile-upside-down"></span>
+        Order above ₹300 <span className="bi bi-emoji-smile-upside-down"></span>
       </div>
       <h2>Checkout</h2>
       {cartProducts.length > 0 ? (
@@ -116,35 +114,34 @@ const Checkout = () => {
             {cartProducts.map((product) => (
               <li
                 key={product._id}
-                className="list-group-item d-flex justify-content-between lh-condensed row"
+                className="list-group-item d-flex align-items-center lh-condensed row g-0"
               >
                 <img
-                  className="col-md-3 rounded rounded-3 shadow-sm img-fluid"
+                  className=" col-3 col-md-auto rounded rounded-3 shadow-smimg-fluid"
                   src={product.image}
                   alt=""
                   style={{ height: 100, width: 100, objectFit: "cover" }}
                 />
-                <div className="col-md-4">
+
+                <div className="col-6 ms-2 col-md-auto text-start ">
                   <h6 className="my-0">{product.title}</h6>
                   <small className="text-muted mt-3 d-flex">
                     {product.description}
                   </small>
-                </div>
-                <div className="col-md-1 d-flex justify-content-center align-items-center">
-                  <span className="text-muted">
+                  <span className="text-muted fw-bold fs-6 me-2">
                     ${(product.price * product.quantity).toFixed(2)}
                   </span>
-                </div>
-                <div className="col-md-2 d-flex align-items-center justify-content-end">
-                  <button
-                    className="btn btn-dark btn-sm rounded rounded-circle bi bi-dash"
-                    onClick={() => handelRemoveOne(product)}
-                  ></button>
-                  <span className="mx-2">{product.quantity}</span>
-                  <button
-                    className="btn btn-dark btn-sm rounded rounded-circle bi bi-plus"
-                    onClick={() => handelAddOne(product)}
-                  ></button>
+                  <div className="display-block">
+                    <button
+                      className="btn btn-dark btn-sm rounded rounded-circle bi bi-dash"
+                      onClick={() => handelRemoveOne(product)}
+                    ></button>
+                    <span className="mx-2">{product.quantity}</span>
+                    <button
+                      className="btn btn-dark btn-sm rounded rounded-circle bi bi-plus"
+                      onClick={() => handelAddOne(product)}
+                    ></button>
+                  </div>
                 </div>
               </li>
             ))}

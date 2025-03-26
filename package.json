@@ -11,6 +11,7 @@
     "cra-template": "1.2.0",
     "crypto-browserify": "^3.12.1",
     "dotenv": "^16.4.7",
+    "firebase": "^11.4.0",
     "formik": "^2.4.6",
     "ishop-project": "file:",
     "os-browserify": "^0.3.0",
@@ -50,5 +51,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "proxy": "https://i-shop-server.onrender.com"
 }

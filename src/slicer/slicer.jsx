@@ -41,6 +41,7 @@ const productCart = createSlice({
           state.products = state.products.filter(
             (item) => item._id !== product._id
           );
+          localStorage.setItem("carts", JSON.stringify(state.products));
         }
       }
       localStorage.setItem("carts", JSON.stringify(state.products));

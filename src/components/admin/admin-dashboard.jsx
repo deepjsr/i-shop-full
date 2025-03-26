@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import AdminNav from "./admin-nav";
-import Sidebar from "../customer/login";
+import Skeleton from "react-loading-skeleton";
 
 function AdminDashboard() {
   const [item, setItem] = useState({ id: 0 });
@@ -16,8 +16,9 @@ function AdminDashboard() {
   ]);
   useEffect(() => {
     axios
-      .get("http://localhost:8080/admin")
-      .then((resp) => setAdmin(resp.data));
+      .get(`${process.env.REACT_APP_BACKEND_HOST_URL}/admin`)
+      .then((resp) => resp.json())
+      .then((data) => setAdmin(data));
   }, []);
   return (
     <div className="container">
@@ -27,17 +28,19 @@ function AdminDashboard() {
           Add Item
         </Link>
       </div>
+      <div className="container bg-info">
+        <Skeleton height={20} count={3} />
+      </div>
       <div
         className="d-flex align-item-center justify-content-center table-responsive"
         style={{ height: "500px" }}
       >
+        {" "}
         <table
           className="table table-striped table-hover"
           style={{ maxWidth: "900px" }}
         >
           <thead className="thead-dark">
-            {" "}
-            {/* Corrected class attribute */}
             <tr>
               <th scope="col">
                 <input type="checkbox" />

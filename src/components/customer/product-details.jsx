@@ -1,134 +1,76 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 // import { addToCart, updateQuantity } from "../../slicer/product-slicer";
 import { addToCart } from "../../slicer/slicer";
-import Skeleton from "react-loading-skeleton";
+import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
+import { useFirebase } from "../../context/firebase";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate(); // Add useNavigate hook
   const [quantity, setQuantity] = useState(1);
   const cartProducts = useSelector((state) => state.productCart.products) || [];
-  console.log(cartProducts, "cartProducts");
 
-  // const [product, setProduct] = useState([
-  //   {
-  //     Id: 0,
-  //     title: "",
-  //     image: "",
-  //     price: 0,
-  //     description: "",
-  //     rating: { rate: 0, count: 0 },
-  //     category: "",
-  //     quantity: 0,
-  //   },
-  // ]);
-  // const [product, setProduct] = useState(null);
-
-  function handleAddToCart(product) {
-    console.log(product, "product");
-    dispatch(addToCart({ product, quantity }));
-  }
-
-  // useEffect(() => {
-  //   axios.get(`http://localhost:8080/products/${parseInt(id)}`).then((resp) => {
-  //     setProduct(Array.isArray(resp.data) ? resp.data[0] : resp.data);
-  //     console.log(typeof resp.data, "resp");
-  //   });
-  // }, [id]);
-
-  // if (!product) {
-  //   return <div>Loading...</div>;
-  // }
-
-  // return (
-  //   <div className="">
-  //     <div className="container my-5">
-  //       <div className="row">
-  //         <div className="col-md-6">
-  //           {product.map((item) => (
-  //             <img
-  //               key={item.Id}
-  //               src={item.image}
-  //               className="img-fluid"
-  //               alt="Product"
-  //               style={{ height: 500, objectFit: "cover" }}
-  //             />
-  //           ))}
-  //           <img
-  //             src={product.image}
-  //             className=""
-  //             alt=""
-  //             style={{ height: 300, objectFit: "cover" }}
-  //           />
-  //         </div>
-  //         {product && (
-  //           <div className="col-md-6">
-  //             <img
-  //               src={product.image}
-  //               className="img-fluid"
-  //               alt="Product"
-  //               style={{ height: 500, objectFit: "cover" }}
-  //             />
-  //             <h2>{product.title || <Skeleton />}</h2>
-  //             <p>Rating: ★★★★☆ ({product.rating?.count} Reviews)</p>
-  //             <p>
-  //               <span className="fs-4 text-danger">
-  //                 ${product.price || <Skeleton />}
-  //               </span>
-  //             </p>
-  //             <button
-  //               onClick={() => handleAddToCart(product)}
-  //               className="btn btn-outline-dark"
-  //             >
-  //               Add To Cart
-  //             </button>
-  //             <h5 className="mt-4">Details</h5>
-  //             <p>{product.description}</p>
-  //           </div>
-  //         )}
-  //       </div>
-  //     </div>
-  //     <Link to="/">
-  //       <button className="btn btn-dark rounded rounded-circle mx-3 my-2">
-  //         <span className="bi bi-arrow-left-short"></span>
-  //       </button>
-  //     </Link>
-  //   </div>
-  // );
+  const firebase = useFirebase();
 
   const [product, setProduct] = useState(null);
 
+  function handleAddToCart(product) {
+    dispatch(addToCart({ product, quantity }));
+  }
+
   useEffect(() => {
-    axios
-      .get(`http://localhost:8080/products/${parseInt(id)}`)
-      .then((resp) => {
-        console.log("API Response:", resp.data);
-        setProduct(Array.isArray(resp.data) ? resp.data[0] : resp.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching product:", error);
-      });
+    firebase.getData(`i-shop-products`).then((snapshot) => {
+      const productArray = Object.values(snapshot.val());
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const productArray = Object.values(data); // Convert object to array
+        const productById = productArray.find(
+          (item) => item.Id === parseInt(id)
+        ); // Ensure both are numbers
+        console.log(productById);
+        setProduct(productById);
+      } else {
+        console.log("No data available");
+      }
+    });
   }, [id]);
 
   if (!product) {
-    return <div>Loading...</div>;
+    return (
+      <div
+        className=" my-5  d-flex align-items-center justify-content-center"
+        style={{ height: "50vh" }}
+      >
+        <div className="spinner-border" role="status">
+          <span className="sr-only"></span>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="container my-5">
+      <button
+        className="btn btn-outline-dark mb-3"
+        onClick={() => navigate("/")}
+      >
+        <span className="bi bi-arrow-left"></span> Back to Home
+      </button>
       <div className="row">
-        <div className="col-md-6">
+        <div className="col-6">
           <img
+            loading="lazy"
             src={product.image}
             className="img-fluid"
             alt="Product"
             style={{ height: 500, objectFit: "cover" }}
           />
         </div>
-        <div className="col-md-6">
+        <div className="col-6">
           <h2>{product.title || <Skeleton />}</h2>
           <p>Rating: ★★★★☆ ({product.rating?.count} Reviews)</p>
           <p>
@@ -138,7 +80,7 @@ const ProductDetails = () => {
           </p>
           <button
             onClick={() => handleAddToCart(product)}
-            className="btn btn-outline-dark"
+            className="btn btn-outline-primary"
           >
             Add To Cart
           </button>

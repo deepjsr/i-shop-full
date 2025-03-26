@@ -1,12 +1,10 @@
 import React from "react";
-import NavBar from "./nav";
-import ProductGrid from "./body";
-import Footer from "./footer";
+import Body from "./body";
 
 function Home() {
   return (
     <div>
-      <ProductGrid />
+      <Body />
     </div>
   );
 }

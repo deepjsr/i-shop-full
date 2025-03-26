@@ -11,15 +11,26 @@ import UserRegister from "./components/customer/register";
 import PrivateRoute from "./components/common/private-route";
 import Checkout from "./components/common/checkout";
 
-function App() {
+function AppContent() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/adminDash");
   const isLoginRoute = location.pathname.startsWith("/login");
   const isRegisterRoute = location.pathname.startsWith("/user-register");
 
   return (
-    <div className="">
+    <div
+      className={`${
+        isAdminRoute || isLoginRoute || isRegisterRoute
+          ? "bg-login"
+          : "bg-body-color"
+      }`}
+    >
       {!isAdminRoute && !isLoginRoute && !isRegisterRoute && <NavBar />}
+      {(isLoginRoute || isRegisterRoute) && (
+        <h1 className="fw-bold fs-2 text-light text-center p-3  mx-3">
+          I-SHOPE
+        </h1>
+      )}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route
@@ -40,12 +51,11 @@ function App() {
   );
 }
 
-function AppWrapper() {
+function App() {
   return (
     <BrowserRouter>
-      <App />
+      <AppContent />
     </BrowserRouter>
   );
 }
-
-export default AppWrapper;
+export default App;

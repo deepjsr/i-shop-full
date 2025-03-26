@@ -5,9 +5,10 @@ import { useCookies } from "react-cookie";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import ProductDetails from "./product-details";
 import { getCookie } from "cookies-next";
-
+import { useFirebase } from "../../context/firebase";
 function Login() {
   const { id } = useParams();
+  const firebase = useFirebase();
   const [cookies, setCookie, removeCookie] = useCookies();
   const navigate = useNavigate();
   const formik = useFormik({
@@ -16,40 +17,53 @@ function Login() {
       password: "",
     },
     onSubmit: (values) => {
-      console.log(values);
-      axios.get("http://localhost:8080/customers").then((response) => {
-        console.log(response.data);
-
-        const user = response.data.find(
-          (item) => item.UserId === values.username
-        );
-        if (user) {
-          if (user.Password === values.password) {
-            // showLoading();
-            const storedIds = JSON.parse(getCookie("id") || "[]");
-            const expires = new Date();
-            expires.setMinutes(expires.getMinutes() + 15);
-            setCookie("username", values.username, { expires });
-            // MySwal.hideLoading();
-            navigate(`/productdetails/${storedIds[storedIds.length - 1]}`);
-            // navigate(`/productdetails/{id}`);
+      axios
+        .get(`${process.env.REACT_APP_BACKEND_HOST_URL}/customers`)
+        .then((response) => {
+          const user = response.data.find(
+            (item) => item.UserId === values.username
+          );
+          if (user) {
+            if (user.Password === values.password) {
+              // showLoading();
+              const storedIds = JSON.parse(getCookie("id") || "[]");
+              const expires = new Date();
+              expires.setMinutes(expires.getMinutes() + 15);
+              setCookie("username", values.username, { expires });
+              // MySwal.hideLoading();
+              navigate(`/productdetails/${storedIds[storedIds.length - 1]}`);
+              // navigate(`/productdetails/{id}`);
+            } else {
+              alert("Invalid password");
+              // MySwal.fire("Invalid password");
+            }
           } else {
-            alert("Invalid password");
-            // MySwal.fire("Invalid password");
+            //   MySwal.fire("Invalid username");
+            alert("Invalid username");
           }
-        } else {
-          //   MySwal.fire("Invalid username");
-          alert("Invalid username");
-        }
-      });
+        });
     },
   });
+
+  async function handleGoogleLogin() {
+    try {
+      const response = await firebase.signInWithGoogle();
+      if (response) {
+        console.log(response.user.isSignedIn, "Google login successful");
+        setCookie("username", response.user.displayName);
+        navigate(`/`);
+      } else {
+      }
+    } catch (error) {
+      console.error("Google login error:", error);
+    }
+  }
   return (
     <div className="">
-      <div className="container  my-4">
+      <div className="container">
         <div className="row">
-          <div className="col-md-5 offset-md-4">
-            <div className="card mt-5">
+          <div className="col-md-6 offset-md-3">
+            <div className="card mt-4">
               <div className="card-body">
                 <div className="text-center">
                   <h3 className="text-start mb-3 fw-bold card-title">
@@ -57,7 +71,7 @@ function Login() {
                   </h3>
                 </div>
                 <form onSubmit={formik.handleSubmit}>
-                  <fieldset class="border p-3">
+                  <fieldset className="border p-3">
                     <div className="mb-3">
                       <label
                         htmlFor="username"
@@ -96,47 +110,27 @@ function Login() {
                       <button type="submit" className="btn btn-primary">
                         Login
                       </button>
+                      <hr className="divider" />
+
+                      <button
+                        type="submit"
+                        className="btn btn-success"
+                        onClick={handleGoogleLogin}
+                      >
+                        <span className="bi bi-google me-2"></span>
+                        Continue With Google
+                      </button>
                     </div>
                   </fieldset>
                 </form>
-                <div
-                  className="
-                d-flex"
-                >
-                  <legend className="border-left fs-6 mt-2 text-secondary w-50">
-                    Login with social media
-                  </legend>
-                  <div className="text-end mt-2 w-50">
-                    <Link to="/user-register">Register New User</Link>
-                  </div>
-                </div>
-                <div className="d-flex row gap-1 align-item-center justify-content-center">
-                  <button
-                    className=" bg-dark text-white rounded rounded-circle "
-                    style={{ height: "50px", width: "50px" }}
-                  >
-                    <span className="bi bi-facebook"></span>{" "}
-                  </button>
-                  <button
-                    className=" bg-dark text-white rounded rounded-circle "
-                    style={{ height: "50px", width: "50px" }}
-                  >
-                    <span className="bi bi-google"></span>
-                  </button>
-                  <button
-                    className=" bg-dark text-white rounded rounded-circle "
-                    style={{ height: "50px", width: "50px" }}
-                  >
-                    <span className="bi bi-microsoft"></span>
-                  </button>
-                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <hr />
-      <p className="text-center">&copy; All rights reserved</p>
+      <p className="text-center mt-3 text-success">
+        &copy; All rights reserved
+      </p>
     </div>
   );
 }

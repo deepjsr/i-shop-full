@@ -11,15 +11,18 @@ import store from "./store/store";
 import { CookiesProvider } from "react-cookie";
 
 import { Provider } from "react-redux";
+import { FirebaseProvider } from "./context/firebase";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <CookiesProvider>
-      <Provider store={store}>
-        <App />
-      </Provider>
-    </CookiesProvider>
+    <FirebaseProvider>
+      <CookiesProvider>
+        <Provider store={store}>
+          <App />
+        </Provider>
+      </CookiesProvider>
+    </FirebaseProvider>
   </React.StrictMode>
 );
 
