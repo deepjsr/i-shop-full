@@ -52,7 +52,6 @@ function Login() {
         console.log(response.user.isSignedIn, "Google login successful");
         setCookie("username", response.user.displayName);
         navigate(`/`);
-      } else {
       }
     } catch (error) {
       console.error("Google login error:", error);

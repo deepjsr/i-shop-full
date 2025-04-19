@@ -10,6 +10,7 @@ import Login from "./components/customer/login";
 import UserRegister from "./components/customer/register";
 import PrivateRoute from "./components/common/private-route";
 import Checkout from "./components/common/checkout";
+import { Toaster } from "react-hot-toast";
 
 function AppContent() {
   const location = useLocation();
@@ -46,6 +47,7 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
+      <Toaster />
       {!isLoginRoute && !isRegisterRoute && <Footer />}
     </div>
   );

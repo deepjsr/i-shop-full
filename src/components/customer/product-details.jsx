@@ -6,6 +6,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { addToCart } from "../../slicer/slicer";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import { useFirebase } from "../../context/firebase";
+import toast from "react-hot-toast";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -13,31 +14,61 @@ const ProductDetails = () => {
   const navigate = useNavigate(); // Add useNavigate hook
   const [quantity, setQuantity] = useState(1);
   const cartProducts = useSelector((state) => state.productCart.products) || [];
+  const productCount =
+    useSelector((state) => state.productCart.productCount) || 0;
 
   const firebase = useFirebase();
 
   const [product, setProduct] = useState(null);
 
   function handleAddToCart(product) {
-    dispatch(addToCart({ product, quantity }));
+    if (!product) {
+      console.error("Product is null or undefined, cannot add to cart");
+      return;
+    }
+
+    dispatch(addToCart({ product, quantity: 1 }));
+    toast.success("Product added to cart", {
+      duration: 8000,
+      position: "top-center",
+      theme: "colored",
+      style: {
+        background: "#333",
+        color: "#fff",
+        top: "80px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+      },
+      closeOnClick: true,
+      hideProgressBar: true,
+      pauseOnHover: true,
+    });
   }
 
   useEffect(() => {
-    firebase.getData(`i-shop-products`).then((snapshot) => {
-      const productArray = Object.values(snapshot.val());
-      if (snapshot.exists()) {
+    firebase
+      .getData(`i-shop-products`)
+      .then((snapshot) => {
+        if (!snapshot.exists()) {
+          console.log("No data available");
+          return;
+        }
+
         const data = snapshot.val();
+        if (!data) {
+          console.error("Snapshot data is null");
+          return;
+        }
+
         const productArray = Object.values(data); // Convert object to array
         const productById = productArray.find(
-          (item) => item.Id === parseInt(id)
-        ); // Ensure both are numbers
-        console.log(productById);
+          (item) => Number(item.Id) === Number(id)
+        );
+
+        console.log("Fetched product:", productById);
         setProduct(productById);
-      } else {
-        console.log("No data available");
-      }
-    });
-  }, [id]);
+      })
+      .catch((error) => console.error("Firebase fetch error:", error));
+  }, [id, firebase, productCount, cartProducts]);
 
   if (!product) {
     return (
@@ -79,10 +110,11 @@ const ProductDetails = () => {
             </span>
           </p>
           <button
+            className="btn btn-outline-primary "
             onClick={() => handleAddToCart(product)}
-            className="btn btn-outline-primary"
+            disabled={!product}
           >
-            Add To Cart
+            {product ? "Add to Cart" : "Loading..."}
           </button>
           <h5 className="mt-4">Details</h5>
           <p>{product.description}</p>
