@@ -15,6 +15,11 @@ const productCart = createSlice({
     addToCart: (state, action) => {
       let { product, quantity } = action.payload;
 
+      if (!product || !product._id) {
+        console.error("Invalid product:", product);
+        return;
+      }
+
       const existingProductIndex = state.products.findIndex(
         (item) => item._id === product._id
       );

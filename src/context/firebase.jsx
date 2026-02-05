@@ -50,6 +50,9 @@ export const FirebaseProvider = (props) => {
   };
 
   const getData = (path) => {
+    console.log("path", path);
+    const dbRef = ref(db, `i-shop-products`);
+    console.log(dbRef, "dbRef");
     return get(ref(db, path));
   };
 

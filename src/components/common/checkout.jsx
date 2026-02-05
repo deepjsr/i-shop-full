@@ -40,7 +40,6 @@ const Checkout = () => {
       if (!res.ok) {
         throw new Error("Network response was not ok");
       }
-
       const data = await res.json();
       console.log(data);
       handlePaymentVerify(data.data);
@@ -51,7 +50,7 @@ const Checkout = () => {
 
   const handlePaymentVerify = async (data) => {
     const options = {
-      key: process.env.RAZORPAY_KEY_ID,
+      key: process.env.REACT_APP_RAZORPAY_KEY_ID,
       amount: data.amount,
       currency: data.currency,
       name: "Deep",
@@ -158,6 +157,14 @@ const Checkout = () => {
             <button onClick={handlePayment} className="btn btn-primary">
               Proceed to Payment
             </button>
+            {/* <button
+              onClick={() => {
+                toast.success("Payment successful (mock)");
+              }}
+              className="btn btn-primary"
+            >
+              Proceed to Payment
+            </button> */}
             <Toaster />
           </div>
         </div>

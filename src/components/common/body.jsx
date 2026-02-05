@@ -1,8 +1,8 @@
-import axios from "axios";
+// import axios from "axios";
 import { getCookie } from "cookies-next";
 import React, { useState, useEffect } from "react";
 import { useCookies } from "react-cookie";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import { useFirebase } from "../../context/firebase";
@@ -36,6 +36,8 @@ const Body = () => {
       .getData(`i-shop-products`)
       .then((snapshot) => {
         if (snapshot.exists()) {
+          console.log(snapshot.val(), "Data fetched successfully");
+
           setProducts(snapshot.val());
           setLoading(false); // Set loading to false when data is fetched
         } else {
@@ -45,7 +47,7 @@ const Body = () => {
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
-  }, []);
+  }, [firebase]);
 
   function handleShopeNowClick(productId) {
     const existingIds = JSON.parse(getCookie("id") || "[]");
